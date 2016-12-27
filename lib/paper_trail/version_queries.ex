@@ -2,45 +2,43 @@ defmodule PaperTrail.VersionQueries do
   import Ecto.Query
   alias PaperTrail.Version
 
-  @repo PaperTrail.RepoClient.repo
-
   @doc """
   Gets all the versions of a record given a module and its id
   """
-  def get_versions(model, id) do
+  def get_versions(repo, model, id) do
     item_type = model |> Module.split |> List.last
-    version_query(item_type, id) |> @repo.all
+    version_query(item_type, id) |> repo.all
   end
 
   @doc """
   Gets all the versions of a record
   """
-  def get_versions(record) do
+  def get_versions(repo, record) do
     item_type = record.__struct__ |> Module.split |> List.last
-    version_query(item_type, record.id) |> @repo.all
+    version_query(item_type, record.id) |> repo.all
   end
 
   @doc """
   Gets the last version of a record given its module reference and its id
   """
-  def get_version(model, id) do
+  def get_version(repo, model, id) do
     item_type = Module.split(model) |> List.last
-    last(version_query(item_type, id)) |> @repo.one
+    last(version_query(item_type, id)) |> repo.one
   end
 
   @doc """
   Gets the last version of a record
   """
-  def get_version(record) do
+  def get_version(repo, record) do
     item_type = record.__struct__ |> Module.split |> List.last
-    last(version_query(item_type, record.id)) |> @repo.one
+    last(version_query(item_type, record.id)) |> repo.one
   end
 
   @doc """
   Gets the current record of a version
   """
-  def get_current(version) do
-    @repo.get("Elixir." <> version.item_type |> String.to_existing_atom, version.item_id)
+  def get_current(repo, version) do
+    repo.get("Elixir." <> version.item_type |> String.to_existing_atom, version.item_id)
   end
 
 

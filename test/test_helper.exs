@@ -1,5 +1,6 @@
 defmodule PaperTrail.Repo do
-  use PaperTrail, otp_app: :paper_trail
+  use Ecto.Repo, otp_app: :paper_trail
+  use PaperTrail#, repo_version: PaperTrail.Repo2 ( Optional )
 end
 
 Mix.Task.run "ecto.create", ~w(-r PaperTrail.Repo)

@@ -2,7 +2,7 @@ defmodule PaperTrail do
 
   defmacro __using__(opts) do
     quote do
-      use Ecto.Repo, otp_app: unquote(opts[:otp_app])
+      @repo_version unquote(opts[:repo_version])
 
       @before_compile PaperTrail
     end
@@ -10,7 +10,7 @@ defmodule PaperTrail do
 
   defmacro __before_compile__(env) do
     repo_client = env.module
-    repo_version = PaperTrail.RepoClient.repo
+    repo_version = Module.get_attribute(env.module, :repo_version) || repo_client
 
     quote do
       alias PaperTrail.VersionQueries
@@ -21,35 +21,35 @@ defmodule PaperTrail do
       Gets all the versions of a record given a module and its id
       """
       def get_versions(model, id) do
-        VersionQueries.get_versions(model, id)
+        VersionQueries.get_versions(unquote(repo_version), model, id)
       end
 
       @doc """
       Gets all the versions of a record
       """
       def get_versions(record) do
-        VersionQueries.get_versions(record)
+        VersionQueries.get_versions(unquote(repo_version), record)
       end
 
       @doc """
       Gets the last version of a record given its module reference and its id
       """
       def get_version(model, id) do
-        VersionQueries.get_version(model, id)
+        VersionQueries.get_version(unquote(repo_version), model, id)
       end
 
       @doc """
       Gets the last version of a record
       """
       def get_version(record) do
-        VersionQueries.get_version(record)
+        VersionQueries.get_version(unquote(repo_version), record)
       end
 
       @doc """
       Gets the current record of a version
       """
       def get_current(version) do
-        VersionQueries.get_current(version)
+        VersionQueries.get_current(unquote(repo_version), version)
       end
 
       @doc """

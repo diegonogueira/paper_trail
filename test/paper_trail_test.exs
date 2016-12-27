@@ -1,6 +1,7 @@
 defmodule PaperTrailTest do
   use ExUnit.Case
   import Ecto.Query
+  alias PaperTrail.Repo
 
   @repo PaperTrail.RepoClient.repo
 
@@ -18,7 +19,7 @@ defmodule PaperTrailTest do
       name: "Acme LLC", is_active: true, city: "Greenwich", people: []
     })
 
-    {:ok, result} = PaperTrail.insert(new_company)
+    {:ok, result} = Repo.insert_and_version(new_company)
 
     company_count = @repo.all(
       from company in Company,
@@ -66,7 +67,7 @@ defmodule PaperTrailTest do
       facebook: "acme.llc"
     })
 
-    {:ok, result} = PaperTrail.update(new_company)
+    {:ok, result} = Repo.update_and_version(new_company)
 
     company_count = @repo.all(
       from company in Company,
@@ -109,7 +110,7 @@ defmodule PaperTrailTest do
   test "deleting a company creates a company version with correct attributes" do
     company = first(Company, :id) |> preload(:people) |> @repo.one
 
-    {:ok, result} = PaperTrail.delete(company)
+    {:ok, result} = Repo.delete_and_version(company)
 
     company_count = @repo.all(
       from company in Company,
@@ -166,13 +167,13 @@ defmodule PaperTrailTest do
     Company.changeset(%Company{}, %{
       name: "Acme LLC",
       website: "http://www.acme.com"
-    }) |> PaperTrail.insert
+    }) |> Repo.insert_and_version
 
     Company.changeset(%Company{}, %{
       name: "Another Company Corp.",
       is_active: true,
       address: "Sesame street 100/3, 101010"
-    }) |> PaperTrail.insert
+    }) |> Repo.insert_and_version
 
     company = first(Company, :id) |> @repo.one
 
@@ -183,7 +184,7 @@ defmodule PaperTrailTest do
       company_id: company.id
     })
 
-    {:ok, result} = PaperTrail.insert(new_person, %{originator: "admin"}) # add link name later on
+    {:ok, result} = Repo.insert_and_version(new_person, %{originator: "admin"}) # add link name later on
 
     person_count = @repo.all(
       from person in Person,
@@ -236,7 +237,7 @@ defmodule PaperTrailTest do
       company_id: target_company.id
     })
 
-    {:ok, result} = PaperTrail.update(new_person, %{
+    {:ok, result} = Repo.update_and_version(new_person, %{
       originator: "user:1",
       linkname: "izelnakri"
     })
@@ -287,7 +288,7 @@ defmodule PaperTrailTest do
   test "deleting a person creates a person version with correct attributes" do
     person = first(Person, :id) |> preload(:company) |> @repo.one
 
-    {:ok, result} = PaperTrail.delete(person)
+    {:ok, result} = Repo.delete_and_version(person)
 
     person_count = @repo.all(
       from person in Person,
